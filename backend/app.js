@@ -1,0 +1,81 @@
+const fs = require('fs');
+const path = require('path');
+
+const express = require('express');
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+
+const placesRoutes = require('./routes/places-routes');
+const usersRoutes = require('./routes/users-routes');
+const HttpError = require('./models/http-error');
+
+const app = express();
+
+app.use(bodyParser.json());
+
+app.use('/uploads/images', express.static(path.join('uploads', 'images')));
+
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+  );
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE');
+
+  next();
+});
+
+app.use('/api/places', placesRoutes);
+app.use('/api/users', usersRoutes);
+
+app.use((req, res, next) => {
+  const error = new HttpError('Could not find this route.', 404);
+  throw error;
+});
+
+app.use((error, req, res, next) => {
+  if (req.file) {
+    fs.unlink(req.file.path, err => {
+      console.log(err);
+    });
+  }
+  if (res.headerSent) {
+    return next(error);
+  }
+  res.status(error.code || 500);
+  res.json({ message: error.message || 'An unknown error occurred!' });
+});
+
+// mongoose
+//   .connect("mongodb+srv://frenchyouth:Fr&n(hy0uth!23@cluster0.nppttgx.mongodb.net/")
+//     //Add mongodb database)
+//   .then(() => {
+//     app.listen(5000);
+//   })
+//   .catch(err => {
+//     console.log(err);
+//   });
+
+  const connectUrl = 'mongodb+srv://frenchyouth:frenchyouth123@cluster0.nppttgx.mongodb.net/';
+ 
+const connectConfig = { 
+  useNewUrlParser: true, 
+  useUnifiedTopology: true, 
+  useCreateIndex: true 
+}
+ 
+mongoose.connect(connectUrl, connectConfig)
+  .then(() => {
+    console.log('+++ Database connected! +++');
+    app.listen(5000);
+  })
+  .catch(err => {
+    console.log(err);
+  });
+
+//   let uri = 'mongodb://<db_user_name>:<password_with_special_characters>@<host>:27017/<db_name>';
+
+// MongoClient.connect(uri, { useNewUrlParser: true }, (err, db) => {
+//    // handle db
+// });
