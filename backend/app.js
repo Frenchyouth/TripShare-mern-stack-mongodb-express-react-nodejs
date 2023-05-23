@@ -47,17 +47,9 @@ app.use((error, req, res, next) => {
   res.json({ message: error.message || 'An unknown error occurred!' });
 });
 
-// mongoose
-//   .connect("mongodb+srv://frenchyouth:Fr&n(hy0uth!23@cluster0.nppttgx.mongodb.net/")
-//     //Add mongodb database)
-//   .then(() => {
-//     app.listen(5000);
-//   })
-//   .catch(err => {
-//     console.log(err);
-//   });
 
-  const connectUrl = 'mongodb+srv://frenchyouth:frenchyouth123@cluster0.nppttgx.mongodb.net/';
+
+  const connectUrl = 'mongodb here';
  
 const connectConfig = { 
   useNewUrlParser: true, 
